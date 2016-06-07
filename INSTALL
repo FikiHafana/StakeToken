@@ -1,0 +1,9 @@
+Building StakeToken
+
+See doc/readme-qt.rst for instructions on building StakeToken QT,
+the intended-for-end-users, nice-graphical-interface, reference
+implementation of StakeToken.
+
+See doc/build-*.txt for instructions on building staketokend,
+the intended-for-services, no-graphical-interface, reference
+implementation of StakeToken.
