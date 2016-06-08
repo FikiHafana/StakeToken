@@ -41,7 +41,7 @@ static const int64_t MAX_MONEY = 3000000000 * COIN;
 
 static const int64_t COIN_YEAR_REWARD = 10000 * CENT;
 static const int64_t MAX_MINT_PROOF_OF_STAKE = 100 * COIN;
-
+static const int64_t FORK_HEIGHT = 560;
 
 static const int MODIFIER_INTERVAL_SWITCH = 1;
 
