@@ -990,10 +990,7 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
     int64_t nSubsidy = 1 * nRewardCoinYear / 365 / COIN;
 	
 	if (pindexBest->nHeight > FORK_HEIGHT)
-		nSubsidy = nSubsidy * COIN;
-
-    if (fDebug && GetBoolArg("-printcreation"))
-        printf("GetProofOfStakeReward(): create=%s\n", FormatMoney(nSubsidy).c_str());
+		return (nSubsidy * COIN) + nFees;
 
     return nSubsidy + nFees;
 }
