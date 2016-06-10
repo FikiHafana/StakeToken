@@ -41,7 +41,7 @@ CBigNum bnProofOfStakeLimit(~uint256(0) >> 20);
 CBigNum bnProofOfWorkLimitTestNet(~uint256(0) >> 16);
 
 unsigned int nTargetSpacing = 2 * 60;
-unsigned int nStakeMinAge = 60 * 60;
+unsigned int nStakeMinAge = 1 * 60 * 60;
 unsigned int nStakeMaxAge = 2 * 60 * 60;
 unsigned int nModifierInterval = 10 * 60;
 
@@ -981,17 +981,9 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 
 
 // miner's coin stake reward based on coin age spent (coin-days)
-int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
-{
-    int64_t nRewardCoinYear;
-
-    nRewardCoinYear = MAX_MINT_PROOF_OF_STAKE;
-
-    int64_t nSubsidy = 1 * nRewardCoinYear / 365 / COIN;
-	
-	if (pindexBest->nHeight > FORK_HEIGHT)
-		return (nSubsidy * COIN) + nFees;
-
+int64_t GetProofOfStakeReward(int64_t nAmount, int64_t nFees)
+{	
+	int64_t nSubsidy = nAmount * 1000 / 365 / 24 / 100;		
     return nSubsidy + nFees;
 }
 
@@ -1869,10 +1861,10 @@ bool CBlock::SetBestChain(CTxDB& txdb, CBlockIndex* pindexNew)
 // guaranteed to be in main chain by sync-checkpoint. This rule is
 // introduced to help nodes establish a consistent view of the coin
 // age (trust score) of competing branches.
-bool CTransaction::GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge) const
+bool CTransaction::GetCoinAge(CTxDB& txdb, uint64_t& nAmount) const
 {
-    CBigNum bnCentSecond = 0;  // coin age in the unit of cent-seconds
-    nCoinAge = 0;
+    CBigNum nSubTotalAmount = 0;
+    nAmount = 0;
 
     if (IsCoinBase())
         return true;
@@ -1895,16 +1887,11 @@ bool CTransaction::GetCoinAge(CTxDB& txdb, uint64_t& nCoinAge) const
             continue; // only count coins meeting min age requirement
 
         int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
-        bnCentSecond += CBigNum(nValueIn) * (nTime-txPrev.nTime) / CENT;
-
-        if (fDebug && GetBoolArg("-printcoinage"))
-            printf("coin age nValueIn=%"PRId64" nTimeDiff=%d bnCentSecond=%s\n", nValueIn, nTime - txPrev.nTime, bnCentSecond.ToString().c_str());
+        nSubTotalAmount += CBigNum(nValueIn);
     }
 
-    CBigNum bnCoinDay = bnCentSecond * CENT / (24 * 60 * 60);
-    if (fDebug && GetBoolArg("-printcoinage"))
-        printf("coin age bnCoinDay=%s\n", bnCoinDay.ToString().c_str());
-    nCoinAge = bnCoinDay.getuint64();
+    nAmount = nSubTotalAmount.getuint64();
+		
     return true;
 }
 
