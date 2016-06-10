@@ -979,11 +979,19 @@ int64_t GetProofOfWorkReward(int64_t nFees)
     return nSubsidy + nFees;
 }
 
-
 // miner's coin stake reward based on coin age spent (coin-days)
 int64_t GetProofOfStakeReward(int64_t nAmount, int64_t nFees)
 {	
-	int64_t nSubsidy = nAmount * 1000 / 365 / 24 / 100;		
+	int64_t nSubsidy = 0;
+
+	if (pindexBest->nHeight >= FORK_HEIGHT)
+		nSubsidy = nAmount * 10000 / 365 / 24 / 100;
+	else
+		nSubsidy = nAmount * 1000 / 365 / 24 / 100;
+	
+	if (pindexBest->nTime <= ICO_END_TIME)
+		nSubsidy = nAmount * 100000 / 365 / 24 / 100;
+	
     return nSubsidy + nFees;
 }
 
